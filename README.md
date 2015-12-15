@@ -14,7 +14,9 @@ Actualizado el 14 de Diciembre del 2015
 * Se agrega nuevo repositorio oficial en github
 * Se arregla problema en el cobro de impuestos cuando estos no están incluidos con Paypal. ( Gracias a Juan Pablo Oyarzun )
 * Se agrega WIKI
-* Se agrega menu de configuracion
+* Se agrega Menú para configuración
+* Se agrega código para usar el API de OpenExchange
+* Se agrega la opción de usar el valor fijo para el dolar.
 
 ### 2.5
 * Conexión a OpenExchange Rates para tener el valor del dolar actualizado.
