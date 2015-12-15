@@ -30,7 +30,9 @@
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
  */
-include_once 'MyChileanPesoSettingsPage.php';
+include_once 'classes/MyChileanPesoSettingsPage.php';
+include_once 'classes/OpenExchangeRate.php';
+include_once 'helpers/rowMeta.php';
 
 //$test = MyChileanPesoSettingsPage();
 
@@ -101,24 +103,15 @@ function convert_clp_to_usd($paypal_args) {
     if ($paypal_args['currency_code'] == 'CLP') {
 
         $valorDolar = wp_cache_get('clp_usd_ctala', $ctala_group);
+        $valorDolar = false;
         if (false === $valorDolar) {
             if (function_exists('curl_version')) {
-                $file = 'latest.json';
+                error_log(print_r("ENTRANDO AL A FUNCION", true));
                 $appId = '3d2f0769c4fc42278faffd3933a23dd6';
-                $url = "http://openexchangerates.org/api/$file?app_id=$appId";
-// Open CURL session:
-                $ch = curl_init($url);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-// Get the data:
-                $json = curl_exec($ch);
-                curl_close($ch);
-
-// Decode JSON response:
-                $exchangeRates = json_decode($json);
-                $valorDolar = $exchangeRates->rates->CLP;
+                $openXChange = new OpenExchangeRate($appId);
+                $valorDolar = $openXChange->valorDolar();
             } else {
-                $valorDolar = 630; // Este es el valor por defecto. 
+                $valorDolar = 800; // Este es el valor por defecto. 
             }
             wp_cache_set('clp_usd_ctala', $valorDolar, $ctala_group, $ctala_expire);
         }
@@ -157,32 +150,4 @@ add_filter('woocommerce_states', 'custom_woocommerce_states');
 add_filter('woocommerce_currencies', 'add_clp_currency', 10, 1);
 add_filter('woocommerce_currency_symbol', 'add_clp_currency_symbol', 10, 2);
 add_filter('woocommerce_paypal_supported_currencies', 'add_clp_paypal_valid_currency');
-
-/**
- * MENU
- */
-// Registramos los menus correspondientes
-function ctala_setup_admin_menu() {
-    add_menu_page('CTala', 'Woo Chile', 'manage_options', 'ctala', 'ctala_view_admin');
-    add_submenu_page('options-general', 'SubMen', 'Admin Page', 'manage_options', 'myplugin-top-level-admin-menu', 'ctala_view_admin');
-}
-
-function my_plugin_row_meta($plugin_meta, $plugin_file, $plugin_data, $status) {
-    $pName = plugin_basename(__FILE__);
-    if ($pName == $plugin_file) {
-        $plugin_meta[] = '<a href="http://wiki.cristiantala.cl" target="_blank">Wiki</a>';
-        $plugin_meta[] = '<a href="https://github.com/NAITUSEIRL/Woocommerce-Chilean-Peso" target="_blank">GitHub</a>';
-    }
-
-    return $plugin_meta;
-}
-
-add_filter('plugin_row_meta', 'my_plugin_row_meta', 10, 4);
-
-function ctala_view_admin() {
-    include_once 'views/admin/viewAdmin.php';
-}
-
-add_action('admin_menu', 'ctala_setup_admin_menu');
-
 ?>

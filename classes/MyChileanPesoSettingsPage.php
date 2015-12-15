@@ -70,7 +70,7 @@ class MyChileanPesoSettingsPage {
         );
 
         add_settings_field(
-                'id_check', // ID
+                'id_check_usarfijodolar', // ID
                 'Usar Valor Fijo Dolar', // Title 
                 array($this, 'id_check_callback'), // Callback
                 'my-setting-admin', // Page
@@ -111,8 +111,8 @@ class MyChileanPesoSettingsPage {
             $new_input['id_fijo_dolar'] = absint($input['id_fijo_dolar']);
 
 
-        if (isset($input['id_check']))
-            $new_input['id_check'] = ($input['id_check']);
+        if (isset($input['id_check_usarfijodolar']))
+            $new_input['id_check_usarfijodolar'] = ($input['id_check_usarfijodolar']);
 
         if (isset($input['title']))
             $new_input['title'] = sanitize_text_field($input['title']);
@@ -153,7 +153,7 @@ class MyChileanPesoSettingsPage {
      */
     public function id_check_callback() {
         printf(
-                '<input type="checkbox" id="id_check" name="my_option_name[id_check]" %s />', isset($this->options['id_check']) ? "checked" : ''
+                '<input type="checkbox" id="id_check_usarfijodolar" name="my_option_name[id_check_usarfijodolar]" %s />', isset($this->options['id_check_usarfijodolar']) ? "checked" : ''
         );
     }
 
