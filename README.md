@@ -7,6 +7,15 @@ Deshabilita el código postal por ahora, debido a que en Chile aún no acostumbr
 
 ## Changelog
 
+### 2.5.12.1
+
+Actualizado el 14 de Diciembre del 2015
+
+* Se agrega nuevo repositorio oficial en github
+* Se arregla problema en el cobro de impuestos cuando estos no están incluidos con Paypal. ( Gracias a Juan Pablo Oyarzun )
+* Se agrega WIKI
+* Se agrega menu de configuracion
+
 ### 2.5
 * Conexión a OpenExchange Rates para tener el valor del dolar actualizado.
 * Se hace cache del valor del dolar para ahorrar consultas.
@@ -21,3 +30,6 @@ Deshabilita el código postal por ahora, debido a que en Chile aún no acostumbr
 ### 2.0
 * Added the Chilean states for WooCommerce
 * Agregadas las Regiones de Chile a WooCommerc
+
+
+### TODO

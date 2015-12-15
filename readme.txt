@@ -25,9 +25,18 @@ Deshabilita el código postal por ahora, debido a que en Chile aún no acostumbr
 
 == TODO ==
 
-Agregar panel de administración para las variables.
+* Agregar menu para configuracion
+* Agregar codigo personal para API de OpenExchange Rates
+* Agregar opcion de dejar FIJO el valor del dolar.
 
 == Changelog ==
+
+= 2.5.12.1 =
+Actualizado el 14 de Diciembre del 2015
+
+* Se agrega nuevo repositorio oficial en github
+* Se arregla problema en el cobro de impuestos cuando estos no están incluidos con Paypal. ( Gracias a Juan Pablo Oyarzun)
+* Se agrega WIKI
 
 = 2.5.5 =
 

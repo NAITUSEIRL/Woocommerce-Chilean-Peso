@@ -3,9 +3,10 @@
 /*
   Plugin Name: WooCommerce Chilean Peso + Chilean States
   Plugin URI: https://github.com/NAITUSEIRL/Woocommerce-Chilean-Peso
+  Wiki URI: http://wiki.cristiantala.cl
   Description: This plugin enables the payment with paypal for Chile and the Chilean states to WooCommerce.
   Version: 2.5.12.1
-  Author: Cristian Tala Sánchez <cristian.tala@gmail.com>
+  Author: Cristian Tala Sánchez <yomismo@cristiantala.cl>
   Author URI: http://www.cristiantala.cl
   License: GPLv3
   Requires at least: 3.0 +
@@ -29,6 +30,10 @@
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
  */
+include_once 'MyChileanPesoSettingsPage.php';
+
+//$test = MyChileanPesoSettingsPage();
+
 register_activation_hook(__FILE__, 'ctala_install_cleancache');
 
 /*
@@ -158,23 +163,26 @@ add_filter('woocommerce_paypal_supported_currencies', 'add_clp_paypal_valid_curr
  */
 // Registramos los menus correspondientes
 function ctala_setup_admin_menu() {
-    add_menu_page('CTala', 'CTala', 'manage_options', 'ctala', 'ctala_view_admin');
-    add_submenu_page('ctala', 'SubMen', 'Admin Page', 'manage_options', 'myplugin-top-level-admin-menu', 'myplugin_admin_page');
+    add_menu_page('CTala', 'Woo Chile', 'manage_options', 'ctala', 'ctala_view_admin');
+    add_submenu_page('options-general', 'SubMen', 'Admin Page', 'manage_options', 'myplugin-top-level-admin-menu', 'ctala_view_admin');
 }
+
+function my_plugin_row_meta($plugin_meta, $plugin_file, $plugin_data, $status) {
+    $pName = plugin_basename(__FILE__);
+    if ($pName == $plugin_file) {
+        $plugin_meta[] = '<a href="http://wiki.cristiantala.cl" target="_blank">Wiki</a>';
+        $plugin_meta[] = '<a href="https://github.com/NAITUSEIRL/Woocommerce-Chilean-Peso" target="_blank">GitHub</a>';
+    }
+
+    return $plugin_meta;
+}
+
+add_filter('plugin_row_meta', 'my_plugin_row_meta', 10, 4);
 
 function ctala_view_admin() {
     include_once 'views/admin/viewAdmin.php';
 }
 
 add_action('admin_menu', 'ctala_setup_admin_menu');
-
-
-add_filter('woocommerce_get_price', 'return_custom_price', $product, 2);
-
-function return_custom_price($price, $product) {
-    global $post, $woocommerce;
-
-    return $price;
-}
 
 ?>
