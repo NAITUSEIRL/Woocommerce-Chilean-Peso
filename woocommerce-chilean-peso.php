@@ -100,22 +100,29 @@ function convert_clp_to_usd($paypal_args) {
 //Segundos en una semana a cachear el valor.
     $ctala_expire = 604800;
 
+    $options = get_option('ctala_options_pesos');
     if ($paypal_args['currency_code'] == 'CLP') {
 
-        $valorDolar = wp_cache_get('clp_usd_ctala', $ctala_group);
-        $valorDolar = false;
-        if (false === $valorDolar) {
-            if (function_exists('curl_version')) {
-                error_log(print_r("ENTRANDO AL A FUNCION", true));
-                $appId = '3d2f0769c4fc42278faffd3933a23dd6';
-                $openXChange = new OpenExchangeRate($appId);
-                $valorDolar = $openXChange->valorDolar();
-            } else {
-                $valorDolar = 800; // Este es el valor por defecto. 
-            }
-            wp_cache_set('clp_usd_ctala', $valorDolar, $ctala_group, $ctala_expire);
-        }
+        // Si está activada la opción de usar el dolar fijo, se usa el valro del dolar del sistema
+        if ($options["id_check_usarfijodolar"] == "on") {
+            $valorDolar = $options["id_fijo_dolar"];
+            error_log(print_r("Se usa el valor por defecto del dolar : $valorDolar", true));
+        } else {
 
+            $valorDolar = wp_cache_get('clp_usd_ctala', $ctala_group);
+        
+            if (false === $valorDolar) {
+                if (function_exists('curl_version')) {
+                    error_log(print_r("ENTRANDO AL A FUNCION", true));
+                    $appId = $options["id_openkey"];
+                    $openXChange = new OpenExchangeRateCT($appId);
+                    $valorDolar = $openXChange->valorDolar();
+                } else {
+                    $valorDolar = 800; // Este es el valor por defecto. 
+                }
+                wp_cache_set('clp_usd_ctala', $valorDolar, $ctala_group, $ctala_expire);
+            }
+        }
         $convert_rate = $valorDolar; //set the converting rate
         $paypal_args['currency_code'] = 'USD'; //change CLP to USD
         $i = 1;
@@ -124,11 +131,11 @@ function convert_clp_to_usd($paypal_args) {
             $paypal_args['amount_' . $i] = round($paypal_args['amount_' . $i] / $convert_rate, 2);
             ++$i;
         }
-        if ($paypal_args['discount_amount_cart'] > 0) {
+        if (isset($paypal_args['discount_amount_cart']) && $paypal_args['discount_amount_cart'] > 0) {
             $paypal_args['discount_amount_cart'] = round($paypal_args['discount_amount_cart'] / $convert_rate, 2);
         }
 
-        if ($paypal_args['tax_cart'] > 0) {
+        if (isset($paypal_args['tax_cart']) && $paypal_args['tax_cart'] > 0) {
             $paypal_args['tax_cart'] = round($paypal_args['tax_cart'] / $convert_rate, 2);
         }
     }

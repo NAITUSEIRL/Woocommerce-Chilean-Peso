@@ -30,7 +30,7 @@ class MyChileanPesoSettingsPage {
      */
     public function create_admin_page() {
         // Set class property
-        $this->options = get_option('my_option_name');
+        $this->options = get_option('ctala_options_pesos');
         ?>
         <div class="wrap">
             <h2></h2>           
@@ -52,7 +52,7 @@ class MyChileanPesoSettingsPage {
     public function page_init() {
         register_setting(
                 'my_option_group', // Option group
-                'my_option_name', // Option name
+                'ctala_options_pesos', // Option name
                 array($this, 'sanitize') // Sanitize
         );
 
@@ -116,7 +116,7 @@ class MyChileanPesoSettingsPage {
 
         if (isset($input['title']))
             $new_input['title'] = sanitize_text_field($input['title']);
-        
+
         if (isset($input['id_openkey']))
             $new_input['id_openkey'] = sanitize_text_field($input['id_openkey']);
 
@@ -135,7 +135,7 @@ class MyChileanPesoSettingsPage {
      */
     public function id_number_callback() {
         printf(
-                '<input type="text" id="id_number" name="my_option_name[id_number]" value="%s" />', isset($this->options['id_number']) ? esc_attr($this->options['id_number']) : ''
+                '<input type="text" id="id_number" name="ctala_options_pesos[id_number]" value="%s" />', isset($this->options['id_number']) ? esc_attr($this->options['id_number']) : ''
         );
     }
 
@@ -144,7 +144,7 @@ class MyChileanPesoSettingsPage {
      */
     public function id_fijo_dolar_callback() {
         printf(
-                '<input type="text" id="id_fijo_dolar" name="my_option_name[id_fijo_dolar]" value="%s" />', isset($this->options['id_fijo_dolar']) ? esc_attr($this->options['id_fijo_dolar']) : ''
+                '<input type="text" id="id_fijo_dolar" name="ctala_options_pesos[id_fijo_dolar]" value="%s" />', isset($this->options['id_fijo_dolar']) ? esc_attr($this->options['id_fijo_dolar']) : ''
         );
     }
 
@@ -153,7 +153,7 @@ class MyChileanPesoSettingsPage {
      */
     public function id_check_callback() {
         printf(
-                '<input type="checkbox" id="id_check_usarfijodolar" name="my_option_name[id_check_usarfijodolar]" %s />', isset($this->options['id_check_usarfijodolar']) ? "checked" : ''
+                '<input type="checkbox" id="id_check_usarfijodolar" name="ctala_options_pesos[id_check_usarfijodolar]" %s />', isset($this->options['id_check_usarfijodolar']) ? "checked" : ''
         );
     }
 
@@ -162,7 +162,7 @@ class MyChileanPesoSettingsPage {
      */
     public function title_callback() {
         printf(
-                '<input type="text" id="title" name="my_option_name[title]" value="%s" />', isset($this->options['title']) ? esc_attr($this->options['title']) : ''
+                '<input type="text" id="title" name="ctala_options_pesos[title]" value="%s" />', isset($this->options['title']) ? esc_attr($this->options['title']) : ''
         );
     }
 
@@ -171,12 +171,16 @@ class MyChileanPesoSettingsPage {
      */
     public function apikey_callback() {
         printf(
-                '<input type="text" id="id_openkey" name="my_option_name[id_openkey]" value="%s" />', isset($this->options['id_openkey']) ? esc_attr($this->options['id_openkey']) : ''
+                '<input type="text" id="id_openkey" name="ctala_options_pesos[id_openkey]" value="%s" />', isset($this->options['id_openkey']) ? esc_attr($this->options['id_openkey']) : ''
         );
+    }
+
+    public function getOptions() {
+        return $this->options;
     }
 
 }
 
-if (is_admin())
-    $my_settings_page = new MyChileanPesoSettingsPage();
+//if (is_admin())
+$my_settings_page = new MyChileanPesoSettingsPage();
 ?>

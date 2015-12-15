@@ -1,17 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of OpenExchangeRate
  *
- * @author ctala
+ * @author Cristian Tala Sánchez
  */
-class OpenExchangeRate {
+class OpenExchangeRateCT {
 
     private $apiKey;
     private $file = 'latest.json';
@@ -23,7 +17,7 @@ class OpenExchangeRate {
      * @param type $apiKey
      */
     public function __construct($apiKey) {
-        error_log(print_r("CREANDO EL OBJETO", true));
+
 
         $this->apiKey = $apiKey;
         $this->url = str_replace("%FILE%", $this->file, $this->url);
