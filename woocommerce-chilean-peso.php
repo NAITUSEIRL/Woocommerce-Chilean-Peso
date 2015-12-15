@@ -126,6 +126,13 @@ function convert_clp_to_usd($paypal_args) {
             $paypal_args['amount_' . $i] = round($paypal_args['amount_' . $i] / $convert_rate, 2);
             ++$i;
         }
+        if ($paypal_args['discount_amount_cart'] > 0) {
+            $paypal_args['discount_amount_cart'] = round($paypal_args['discount_amount_cart'] / $convert_rate, 2);
+        }
+
+        if ($paypal_args['tax_cart'] > 0) {
+            $paypal_args['tax_cart'] = round($paypal_args['tax_cart'] / $convert_rate, 2);
+        }
     }
     return $paypal_args;
 }
@@ -146,19 +153,28 @@ add_filter('woocommerce_currencies', 'add_clp_currency', 10, 1);
 add_filter('woocommerce_currency_symbol', 'add_clp_currency_symbol', 10, 2);
 add_filter('woocommerce_paypal_supported_currencies', 'add_clp_paypal_valid_currency');
 
-
-
 /**
  * MENU
  */
-
 // Registramos los menus correspondientes
 function ctala_setup_admin_menu() {
     add_menu_page('CTala', 'CTala', 'manage_options', 'ctala', 'ctala_view_admin');
     add_submenu_page('ctala', 'SubMen', 'Admin Page', 'manage_options', 'myplugin-top-level-admin-menu', 'myplugin_admin_page');
 }
+
 function ctala_view_admin() {
     include_once 'views/admin/viewAdmin.php';
 }
+
 add_action('admin_menu', 'ctala_setup_admin_menu');
+
+
+add_filter('woocommerce_get_price', 'return_custom_price', $product, 2);
+
+function return_custom_price($price, $product) {
+    global $post, $woocommerce;
+
+    return $price;
+}
+
 ?>
