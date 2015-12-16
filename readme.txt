@@ -8,9 +8,9 @@ Tags:
 
 Requires at least: 3, 3.3+ and WooCommerce 1.4+, Chilean Peso, Pesos Chilenos, currency
 
-Tested up to: 3.6
+Tested up to: 4.4
 
-Stable tag: 2.5.5
+Stable tag: 2.5.12.2
 
 == Description ==
 
@@ -20,6 +20,10 @@ Enable the paypal payment through CLP to USD conversion.
 Disables the postal code as required.
 
 Lo que hace este plugin es facilitar la integración de los pesos Chilenos a Woocommerce, además de agregar las distintas regiones del país ( Chile obviamente ) y aceptar pagos con paypal a través de dolares. 
+
+Si se requiere usar el valor actualizado del dolar es necesario crear un api en https://openexchangerates.org/ y agregarla a la configuracion del plugin.
+
+La Configuracion del plugin se puede encontrar en el menu de settings bajo el nombre de Chilean Peso
 
 Deshabilita el código postal por ahora, debido a que en Chile aún no acostumbramos a utilizarlo.
 
