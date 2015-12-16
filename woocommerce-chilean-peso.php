@@ -104,7 +104,7 @@ function convert_clp_to_usd($paypal_args) {
     if ($paypal_args['currency_code'] == 'CLP') {
 
         // Si está activada la opción de usar el dolar fijo, se usa el valro del dolar del sistema
-        if ($options["id_check_usarfijodolar"] == "on") {
+        if (isset($options["id_check_usarfijodolar"]) && $options["id_check_usarfijodolar"] == "on") {
             $valorDolar = $options["id_fijo_dolar"];
             error_log(print_r("Se usa el valor por defecto del dolar : $valorDolar", true));
         } else {
