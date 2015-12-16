@@ -7,6 +7,10 @@ Deshabilita el código postal por ahora, debido a que en Chile aún no acostumbr
 
 ## Changelog
 
+### 2.5.12.2
+* Se agrega validacion de que el codigo del api de OpenXChange exista antes de crear el objeto.
+* Se valida que las variables existan antes de preguntar por ellas.
+
 ### 2.5.12.1
 
 Actualizado el 14 de Diciembre del 2015

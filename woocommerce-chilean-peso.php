@@ -5,7 +5,7 @@
   Plugin URI: https://github.com/NAITUSEIRL/Woocommerce-Chilean-Peso
   Wiki URI: http://wiki.cristiantala.cl
   Description: This plugin enables the payment with paypal for Chile and the Chilean states to WooCommerce.
-  Version: 2.5.12.1
+  Version: 2.5.12.2
   Author: Cristian Tala Sánchez <yomismo@cristiantala.cl>
   Author URI: http://www.cristiantala.cl
   License: GPLv3
@@ -97,8 +97,8 @@ function add_clp_paypal_valid_currency($currencies) {
 function convert_clp_to_usd($paypal_args) {
     //Grupo para el cache
     $ctala_group = "ctala";
-//Segundos en una semana a cachear el valor.
-    $ctala_expire = 604800;
+    //Segundos en un día.
+    $ctala_expire = 86400;
 
     $options = get_option('ctala_options_pesos');
     if ($paypal_args['currency_code'] == 'CLP') {
@@ -110,15 +110,15 @@ function convert_clp_to_usd($paypal_args) {
         } else {
 
             $valorDolar = wp_cache_get('clp_usd_ctala', $ctala_group);
-        
+
             if (false === $valorDolar) {
-                if (function_exists('curl_version')) {
+                if (function_exists('curl_version') && isset($options["id_openkey"])) {
                     error_log(print_r("ENTRANDO AL A FUNCION", true));
                     $appId = $options["id_openkey"];
                     $openXChange = new OpenExchangeRateCT($appId);
                     $valorDolar = $openXChange->valorDolar();
                 } else {
-                    $valorDolar = 800; // Este es el valor por defecto. 
+                    $valorDolar = 690; // Este es el valor por defecto. 
                 }
                 wp_cache_set('clp_usd_ctala', $valorDolar, $ctala_group, $ctala_expire);
             }
