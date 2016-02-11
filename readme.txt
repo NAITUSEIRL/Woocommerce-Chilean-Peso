@@ -28,8 +28,12 @@ La Configuracion del plugin se puede encontrar en el menu de settings bajo el no
 Deshabilita el código postal por ahora, debido a que en Chile aún no acostumbramos a utilizarlo.
 
 == TODO ==
+* Implementar comunas.
 
 == Changelog ==
+
+= 3.0 = 
+* Se transforma el plugin para usar namespaces.
 
 = 2.5.12.2 = 
 

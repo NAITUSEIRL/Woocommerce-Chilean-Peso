@@ -1,0 +1,18 @@
+{
+    "name": "ctala/woocommerce-chilean-peso",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Cristian Tala S.",
+            "email": "cristian.tala@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "CTala\\Classes\\": "classes/",
+            "CTala\\Helpers\\": "helpers/"
+        }
+    }
+}

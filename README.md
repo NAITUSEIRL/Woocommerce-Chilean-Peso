@@ -7,6 +7,9 @@ Deshabilita el código postal por ahora, debido a que en Chile aún no acostumbr
 
 ## Changelog
 
+### 3.0
+* Se transforma para usar namespaces. ( PHP V5.3+)
+
 ### 2.5.12.2
 * Se agrega validacion de que el codigo del api de OpenXChange exista antes de crear el objeto.
 * Se valida que las variables existan antes de preguntar por ellas.

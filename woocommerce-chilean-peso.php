@@ -1,11 +1,13 @@
 <?php
 
+namespace CTala\WooCommerceChileanPeso;
+
 /*
   Plugin Name: WooCommerce Chilean Peso + Chilean States
   Plugin URI: https://github.com/NAITUSEIRL/Woocommerce-Chilean-Peso
   Wiki URI: http://wiki.cristiantala.cl
   Description: This plugin enables the payment with paypal for Chile and the Chilean states to WooCommerce.
-  Version: 2.5.12.2
+  Version: 3.2-DEV
   Author: Cristian Tala Sánchez <yomismo@cristiantala.cl>
   Author URI: http://www.cristiantala.cl
   License: GPLv3
@@ -30,13 +32,27 @@
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
  */
+
+include_once 'vendor/autoload.php';
+
+use CTala\Classes\ChileSetup;
+use CTala\Helpers\Logger;
+
 include_once 'classes/MyChileanPesoSettingsPage.php';
 include_once 'classes/OpenExchangeRate.php';
 include_once 'helpers/rowMeta.php';
 
-//$test = MyChileanPesoSettingsPage();
+register_activation_hook(__FILE__, '\CTala\WooCommerceChileanPeso\ctala_install_cleancache');
 
-register_activation_hook(__FILE__, 'ctala_install_cleancache');
+
+if (class_exists('CTala\Classes\ChileSetup')) {
+    $cn = new ChileSetup();
+    // Register for activation
+    
+    register_activation_hook(__FILE__, array(&$cn, 'crear_bdd_localidades_chile'));
+
+//  register_activation_hook( __FILE__, array( &$cn, 'wpClassSetup' );
+}
 
 /*
  * Esta funcion limpia el cache luego de instalar la nueva versión del plugin.
