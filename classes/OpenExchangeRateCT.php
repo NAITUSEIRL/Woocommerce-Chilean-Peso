@@ -1,5 +1,7 @@
 <?php
 
+namespace CTala\Classes;
+
 /**
  * Description of OpenExchangeRate
  *
@@ -22,7 +24,7 @@ class OpenExchangeRateCT {
         $this->apiKey = $apiKey;
         $this->url = str_replace("%FILE%", $this->file, $this->url);
         $this->url = str_replace("%KEY%", $this->apiKey, $this->url);
-        error_log(print_r("URL :".$this->url, true));
+        error_log(print_r("URL :" . $this->url, true));
         // Open CURL session:
         $ch = curl_init($this->url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

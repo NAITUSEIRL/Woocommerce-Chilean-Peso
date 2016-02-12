@@ -36,23 +36,16 @@ namespace CTala\WooCommerceChileanPeso;
 include_once 'vendor/autoload.php';
 
 use CTala\Classes\ChileSetup;
+use CTala\Classes\ChileAddresss;
+use CTala\Classes\ChileCurrencies;
 use CTala\Helpers\Logger;
 
-include_once 'classes/MyChileanPesoSettingsPage.php';
-include_once 'classes/OpenExchangeRate.php';
-include_once 'helpers/rowMeta.php';
-
-register_activation_hook(__FILE__, '\CTala\WooCommerceChileanPeso\ctala_install_cleancache');
 
 
-if (class_exists('CTala\Classes\ChileSetup')) {
-    $cn = new ChileSetup();
-    // Register for activation
-    
-    register_activation_hook(__FILE__, array(&$cn, 'crear_bdd_localidades_chile'));
+//include_once 'classes/MyChileanPesoSettingsPage.php';
+//include_once 'classes/OpenExchangeRate.php';
+//include_once 'helpers/rowMeta.php';
 
-//  register_activation_hook( __FILE__, array( &$cn, 'wpClassSetup' );
-}
 
 /*
  * Esta funcion limpia el cache luego de instalar la nueva versión del plugin.
@@ -63,114 +56,42 @@ function ctala_install_cleancache() {
     wp_cache_delete("clp_usd_ctala", "ctala");
 }
 
-function add_clp_currency($currencies) {
+register_activation_hook(__FILE__, '\CTala\WooCommerceChileanPeso\ctala_install_cleancache');
 
-    $currencies["CLP"] = 'Pesos Chilenos';
-    return $currencies;
+
+if (class_exists('CTala\Classes\ChileSetup')) {
+    $chileSetup = new ChileSetup();
+    // Puedo acceder a la clase. La genero.
+    register_activation_hook(__FILE__, array(&$chileSetup, 'crear_bdd_localidades_chile'));
+    register_activation_hook(__FILE__, array(&$chileSetup, 'insertar_datos_localidades_chile'));
 }
-
-function add_clp_currency_symbol($currency_symbol, $currency) {
-    switch ($currency) {
-        case 'CLP': $currency_symbol = '$';
-            break;
-    }
-    return $currency_symbol;
+if (class_exists('CTala\Classes\ChileAddresss')) {
+    $chileAddress = new ChileAddresss();
+//    add_filter('woocommerce_general_settings', array(&$cn, 'add_order_number_start_setting'));
+    add_filter("woocommerce_checkout_fields", array(&$chileAddress, "order_fields"));
+    add_filter('woocommerce_states', array(&$chileAddress, 'custom_woocommerce_states'));
 }
-
-function custom_woocommerce_states($states) {
-
-    $states['CL'] = array(
-        'I' => 'I de Tarapacá',
-        'II' => 'II de Antofagasta',
-        'III' => 'III de Atacama',
-        'IV' => 'IV de Coquimbo',
-        'V' => 'V de Valparaíso',
-        'VI' => 'VI del Libertador General Bernardo O\'Higgins',
-        'VII' => 'VII del Maule',
-        'VIII' => 'VIII del Bío Bío',
-        'IX' => 'IX de la Araucanía',
-        'XIV' => 'XIV de los Ríos',
-        'X' => 'X de los Lagos',
-        'XI' => 'XI Aysén del General Carlos Ibáñez del Campo',
-        'XII' => 'XII de Magallanes y Antártica Chilena',
-        'RM' => 'Metropolitana de Santiago',
-        'XV' => 'XV de Arica y Parinacota',
-    );
-
-    return $states;
-}
-
-function add_clp_paypal_valid_currency($currencies) {
-    array_push($currencies, 'CLP');
-    return $currencies;
-}
-
 /*
- * Hace el cambio del valor a dolares a través de OpenExchange
- * Se necesita tener curl instalado para que esto funcione.
+ * Todos los filtros a continuación son los originales del plugin
  */
+if (class_exists('CTala\Classes\ChileCurrencies')) {
+    $chileCurrencies = new ChileCurrencies();
 
-function convert_clp_to_usd($paypal_args) {
-    //Grupo para el cache
-    $ctala_group = "ctala";
-    //Segundos en un día.
-    $ctala_expire = 86400;
+    //Se eliminan los códigos postales como obligatorios. (Filtro)
+//    Logger::log_me("Eliminando el código postal obligatorio", __CLASS__);
+    add_filter('woocommerce_default_address_fields', array(&$chileCurrencies, 'postalcode_override_default_address_fields'));
 
-    $options = get_option('ctala_options_pesos');
-    if ($paypal_args['currency_code'] == 'CLP') {
+//    Logger::log_me("Agregando funcion de cambio de clp a usd", __CLASS__);
+    add_filter('woocommerce_paypal_args', array(&$chileCurrencies, 'convert_clp_to_usd'));
 
-        // Si está activada la opción de usar el dolar fijo, se usa el valro del dolar del sistema
-        if (isset($options["id_check_usarfijodolar"]) && $options["id_check_usarfijodolar"] == "on") {
-            $valorDolar = $options["id_fijo_dolar"];
-            error_log(print_r("Se usa el valor por defecto del dolar : $valorDolar", true));
-        } else {
+//    Logger::log_me("Agregando el Peso Chileno", __CLASS__);
+//    add_filter('woocommerce_currencies', array(&$chileCurrencies, 'add_clp_currency_ctala', 10, 1));
 
-            $valorDolar = wp_cache_get('clp_usd_ctala', $ctala_group);
+//    Logger::log_me("Agregando el Simbolo del peso Chileno", __CLASS__);
+    add_filter('woocommerce_currency_symbol', array(&$chileCurrencies, 'add_clp_currency_symbol'), 10, 2);
 
-            if (false === $valorDolar) {
-                if (function_exists('curl_version') && isset($options["id_openkey"])) {
-                    error_log(print_r("ENTRANDO AL A FUNCION", true));
-                    $appId = $options["id_openkey"];
-                    $openXChange = new OpenExchangeRateCT($appId);
-                    $valorDolar = $openXChange->valorDolar();
-                } else {
-                    $valorDolar = 690; // Este es el valor por defecto. 
-                }
-                wp_cache_set('clp_usd_ctala', $valorDolar, $ctala_group, $ctala_expire);
-            }
-        }
-        $convert_rate = $valorDolar; //set the converting rate
-        $paypal_args['currency_code'] = 'USD'; //change CLP to USD
-        $i = 1;
-
-        while (isset($paypal_args['amount_' . $i])) {
-            $paypal_args['amount_' . $i] = round($paypal_args['amount_' . $i] / $convert_rate, 2);
-            ++$i;
-        }
-        if (isset($paypal_args['discount_amount_cart']) && $paypal_args['discount_amount_cart'] > 0) {
-            $paypal_args['discount_amount_cart'] = round($paypal_args['discount_amount_cart'] / $convert_rate, 2);
-        }
-
-        if (isset($paypal_args['tax_cart']) && $paypal_args['tax_cart'] > 0) {
-            $paypal_args['tax_cart'] = round($paypal_args['tax_cart'] / $convert_rate, 2);
-        }
-    }
-    return $paypal_args;
+//    Logger::log_me("Agrega el peso Chileno para que pueda ser pagado con paypal", __CLASS__);
+    add_filter('woocommerce_paypal_supported_currencies', array(&$chileCurrencies, 'add_clp_paypal_valid_currency'));
 }
-
-// Se eliminan los datos postales como obligatorios.
-function postalcode_override_default_address_fields($address_fields) {
-    $address_fields['postcode']['required'] = false;
-
-    return $address_fields;
-}
-
-//Se eliminan los códigos postales como obligatorios. (Filtro)
-add_filter('woocommerce_default_address_fields', 'postalcode_override_default_address_fields');
-
-add_filter('woocommerce_paypal_args', 'convert_clp_to_usd');
-add_filter('woocommerce_states', 'custom_woocommerce_states');
-add_filter('woocommerce_currencies', 'add_clp_currency', 10, 1);
-add_filter('woocommerce_currency_symbol', 'add_clp_currency_symbol', 10, 2);
-add_filter('woocommerce_paypal_supported_currencies', 'add_clp_paypal_valid_currency');
+;
 ?>
