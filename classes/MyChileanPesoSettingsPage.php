@@ -1,5 +1,7 @@
 <?php
+
 namespace CTala\Classes;
+
 class MyChileanPesoSettingsPage {
 
     /**
@@ -182,5 +184,5 @@ class MyChileanPesoSettingsPage {
 }
 
 //if (is_admin())
-$my_settings_page = new MyChileanPesoSettingsPage();
+
 ?>

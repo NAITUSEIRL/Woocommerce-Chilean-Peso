@@ -53,7 +53,7 @@ class OpenExchangeRateCT {
      */
     public function USDToCLP($USD) {
         $convert_rate = $this->valorDolar();
-        return round($clp * $convert_rate, 2);
+        return round($USD * $convert_rate, 2);
     }
 
     public function valorDolar() {

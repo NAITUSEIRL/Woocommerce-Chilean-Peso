@@ -33,65 +33,87 @@ namespace CTala\WooCommerceChileanPeso;
  *      MA 02110-1301, USA.
  */
 
+//Con esto incluimos los distintos namespaces.
 include_once 'vendor/autoload.php';
 
 use CTala\Classes\ChileSetup;
 use CTala\Classes\ChileAddresss;
 use CTala\Classes\ChileCurrencies;
-use CTala\Helpers\Logger;
-
-
-
-//include_once 'classes/MyChileanPesoSettingsPage.php';
-//include_once 'classes/OpenExchangeRate.php';
-//include_once 'helpers/rowMeta.php';
-
+use CTala\Classes\MyChileanPesoSettingsPage;
+use CTala\Classes\ChileSeleccionar;
+use CTala\Helpers\Misc;
 
 /*
  * Esta funcion limpia el cache luego de instalar la nueva versión del plugin.
  */
 
 function ctala_install_cleancache() {
-
     wp_cache_delete("clp_usd_ctala", "ctala");
 }
 
 register_activation_hook(__FILE__, '\CTala\WooCommerceChileanPeso\ctala_install_cleancache');
 
+/**
+ * Check if WooCommerce is active
+ * Todas las funciones del plugin dependen de WooCommerce,
+ * si este no esta activado no vale la pena cargar las funciones ni registrar los hooks.
+ * */
+if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
 
-if (class_exists('CTala\Classes\ChileSetup')) {
-    $chileSetup = new ChileSetup();
-    // Puedo acceder a la clase. La genero.
-    register_activation_hook(__FILE__, array(&$chileSetup, 'crear_bdd_localidades_chile'));
-    register_activation_hook(__FILE__, array(&$chileSetup, 'insertar_datos_localidades_chile'));
-}
-if (class_exists('CTala\Classes\ChileAddresss')) {
-    $chileAddress = new ChileAddresss();
+
+
+    if (class_exists('CTala\Classes\MyChileanPesoSettingsPage')) {
+        $my_settings_page = new MyChileanPesoSettingsPage();
+    }
+
+    if (class_exists('CTala\Helpers\Misc')) {
+        $misc = new Misc();
+//    add_filter('plugin_row_meta', array(&$misc, 'my_plugin_row_meta', 10, 4));
+    }
+
+    if (class_exists('CTala\Classes\ChileSeleccionar')) {
+
+        $GLOBALS['wc_city_select'] = new ChileSeleccionar();
+    }
+
+    if (class_exists('CTala\Classes\ChileSetup')) {
+        $chileSetup = new ChileSetup();
+        // Puedo acceder a la clase. La genero.
+        register_activation_hook(__FILE__, array(&$chileSetup, 'crear_bdd_localidades_chile'));
+        register_activation_hook(__FILE__, array(&$chileSetup, 'insertar_datos_localidades_chile'));
+    }
+    if (class_exists('CTala\Classes\ChileAddresss')) {
+        $chileAddress = new ChileAddresss();
 //    add_filter('woocommerce_general_settings', array(&$cn, 'add_order_number_start_setting'));
-    add_filter("woocommerce_checkout_fields", array(&$chileAddress, "order_fields"));
-    add_filter('woocommerce_states', array(&$chileAddress, 'custom_woocommerce_states'));
-}
-/*
- * Todos los filtros a continuación son los originales del plugin
- */
-if (class_exists('CTala\Classes\ChileCurrencies')) {
-    $chileCurrencies = new ChileCurrencies();
+        add_filter("woocommerce_checkout_fields", array(&$chileAddress, "order_fields"));
+        add_filter('woocommerce_states', array(&$chileAddress, 'custom_woocommerce_states'));
+        add_filter('woocommerce_general_settings', array(&$chileAddress, 'add_order_number_start_setting'));
+        add_filter('wc_city_select_cities', array(&$chileAddress, 'my_cities'));
 
-    //Se eliminan los códigos postales como obligatorios. (Filtro)
+        add_action('wp_ajax_my_action', array(&$chileAddress, 'my_action_callback'));
+    }
+
+
+    /*
+     * Todos los filtros a continuación son los originales del plugin
+     */
+    if (class_exists('CTala\Classes\ChileCurrencies')) {
+        $chileCurrencies = new ChileCurrencies();
+
+        //Se eliminan los códigos postales como obligatorios. (Filtro)
 //    Logger::log_me("Eliminando el código postal obligatorio", __CLASS__);
-    add_filter('woocommerce_default_address_fields', array(&$chileCurrencies, 'postalcode_override_default_address_fields'));
+        add_filter('woocommerce_default_address_fields', array(&$chileCurrencies, 'postalcode_override_default_address_fields'));
 
 //    Logger::log_me("Agregando funcion de cambio de clp a usd", __CLASS__);
-    add_filter('woocommerce_paypal_args', array(&$chileCurrencies, 'convert_clp_to_usd'));
+        add_filter('woocommerce_paypal_args', array(&$chileCurrencies, 'convert_clp_to_usd'));
 
 //    Logger::log_me("Agregando el Peso Chileno", __CLASS__);
 //    add_filter('woocommerce_currencies', array(&$chileCurrencies, 'add_clp_currency_ctala', 10, 1));
-
 //    Logger::log_me("Agregando el Simbolo del peso Chileno", __CLASS__);
-    add_filter('woocommerce_currency_symbol', array(&$chileCurrencies, 'add_clp_currency_symbol'), 10, 2);
+        add_filter('woocommerce_currency_symbol', array(&$chileCurrencies, 'add_clp_currency_symbol'), 10, 2);
 
 //    Logger::log_me("Agrega el peso Chileno para que pueda ser pagado con paypal", __CLASS__);
-    add_filter('woocommerce_paypal_supported_currencies', array(&$chileCurrencies, 'add_clp_paypal_valid_currency'));
+        add_filter('woocommerce_paypal_supported_currencies', array(&$chileCurrencies, 'add_clp_paypal_valid_currency'));
+    }
 }
-;
 ?>
